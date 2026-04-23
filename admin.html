@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin System | MBSTU STORE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background-color: #f1f5f9;">
+
+  <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;"></div>
+
+  <!-- Admin Navbar -->
+  <nav class="navbar navbar-expand-lg border-bottom bg-white sticky-top py-3 shadow-sm">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="admin.html">
+        <i class="bi bi-shield-check text-danger me-2 fs-4"></i> <span class="fw-bolder letter-spacing-1">STORE ADMIN</span>
+      </a>
+      <div class="d-flex ms-auto align-items-center gap-4">
+        <span class="text-primary fw-bolder bg-primary-subtle px-3 py-1 rounded-pill"><i class="bi bi-person-badge"></i> <span id="nav-username"></span></span>
+        <button class="btn btn-outline-danger fw-bold rounded-pill px-4" onclick="logout()">Terminate Session</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5 fade-in">
+    
+    <div class="row mb-4">
+      <div class="col-12 text-center text-md-start">
+        <h2 class="fw-bolder" style="letter-spacing:-1px;">Management Overview</h2>
+        <p class="text-muted fw-semibold">Control your inventory and oversee corporate sales.</p>
+      </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4 gap-2" id="admin-tabs" role="tablist">
+      <li class="nav-item border rounded" role="presentation">
+        <button class="nav-link active px-4 py-2 fw-bold" data-bs-toggle="pill" data-bs-target="#products-tab" type="button" role="tab"><i class="bi bi-box me-2"></i> Inventory</button>
+      </li>
+      <li class="nav-item border rounded bg-white" role="presentation">
+        <button class="nav-link px-4 py-2 fw-bold" data-bs-toggle="pill" data-bs-target="#orders-tab" type="button" role="tab"><i class="bi bi-receipt me-2"></i> Global Ledgers</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="admin-tabs-content">
+      
+      <!-- Products Tab -->
+      <div class="tab-pane fade show active" id="products-tab" role="tabpanel">
+        <div class="row gy-4">
+          
+          <div class="col-xl-4 col-lg-5">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 20px;">
+              <h5 class="fw-bolder mb-4 text-dark"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Register Product</h5>
+              <form id="add-product-form" onsubmit="addProduct(event)">
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bolder text-uppercase">Display Name</label>
+                  <input type="text" class="form-control bg-light border-0 py-2 fw-semibold" id="prod-name" placeholder="E.g. Smart Watch Active" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bolder text-uppercase">Retail Price ($)</label>
+                  <input type="number" step="0.01" class="form-control bg-light border-0 py-2 fw-semibold" id="prod-price" placeholder="199.99" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bolder text-uppercase">Categorization</label>
+                  <input type="text" class="form-control bg-light border-0 py-2 fw-semibold" id="prod-category" placeholder="Apparel, Tech, Decor" required>
+                </div>
+                <div class="mb-4 pt-2">
+                  <label class="form-label text-muted small fw-bolder text-uppercase">Master Image Upload</label>
+                  <input type="file" accept="image/*" class="form-control py-2 fw-semibold border" id="prod-image">
+                  <div class="form-text mt-2"><i class="bi bi-cloud-arrow-up"></i> Upload directly from your system to database.</div>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100 py-3 shadow">Publish to Storefront</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="col-xl-8 col-lg-7">
+            <div class="table-responsive bg-white shadow-sm p-4" style="border-radius: 20px;">
+              <h5 class="fw-bolder mb-4">Active Database</h5>
+              <table class="table mb-0 table-borderless table-hover">
+                <thead class="border-bottom">
+                  <tr>
+                    <th class="text-muted small">REF#</th>
+                    <th class="text-muted small">ASSET</th>
+                    <th class="text-muted small">MSRP</th>
+                    <th class="text-muted small">CATEGORY</th>
+                    <th class="text-muted small">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-products-table" class="mt-2">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div class="tab-pane fade" id="orders-tab" role="tabpanel">
+        <div class="table-responsive bg-white shadow-sm p-4" style="border-radius: 20px;">
+          <h5 class="fw-bolder mb-4">Master Ledger</h5>
+          <table class="table mb-0 table-borderless table-hover">
+            <thead class="border-bottom">
+              <tr>
+                <th class="text-muted small">INVOICE</th>
+                <th class="text-muted small">CUSTOMER</th>
+                <th class="text-muted small">TIMESTAMP</th>
+                <th class="text-muted small">CLEARANCE</th>
+                <th class="text-muted small">NET PROFIT</th>
+                <th class="text-muted small">ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-table">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+  </div>
+
+  <!-- Order Details Modal -->
+  <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+        <div class="modal-header bg-light border-0">
+          <h5 class="modal-title fw-bolder" id="orderDetailsModalLabel">Order Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" id="order-details-body">
+          <!-- Items will be injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js?v=5"></script>
+  <script>
+    window.onload = function() {
+      checkAccess('admin');
+      document.getElementById('products-tab').addEventListener('click', renderAdminProducts);
+      document.getElementById('orders-tab').addEventListener('click', renderAdminOrders);
+      renderAdminProducts();
+      renderAdminOrders();
+    };
+  </script>
+</body>
+</html>
