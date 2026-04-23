@@ -1,3 +1,18 @@
+// ====== Firebase Setup ======
+const firebaseConfig = {
+  apiKey: "AIzaSyAiOeyT9d15L5mc1zW1YHjuAKz51RAToiM",
+  authDomain: "mbstustore.firebaseapp.com",
+  projectId: "mbstustore",
+  storageBucket: "mbstustore.firebasestorage.app",
+  messagingSenderId: "706403777481",
+  appId: "1:706403777481:web:bdf5ee30105761faebc618"
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
 // ====== Global Store State APIs ======
 // This replaces localStorage usage for core data
 let cachedProducts = [];
@@ -15,24 +30,21 @@ function getCurrentUser() {
   return user ? JSON.parse(user) : null;
 }
 
-// Fetch products from MySQL node backend
+// Fetch products from Firebase
 async function fetchProductsFromDB() {
   try {
-    const res = await fetch('http://localhost:3000/api/products');
-    if (!res.ok) throw new Error("Local backend unavailable");
-    cachedProducts = await res.json();
+    const snapshot = await db.collection('products').get();
+    let products = [];
+    snapshot.forEach(doc => {
+      let p = doc.data();
+      p.id = parseInt(doc.id) || p.id;
+      products.push(p);
+    });
+    cachedProducts = products;
     return cachedProducts;
-  } catch (err) { 
-    console.log("Backend offline. Falling back to static products.json"); 
-    try {
-      // Use fallback products.json file for static hosting environments like GitHub Pages
-      const res = await fetch('products.json');
-      cachedProducts = await res.json();
-      return cachedProducts;
-    } catch(e) {
-      console.error("Error fetching static products:", e);
-      return [];
-    }
+  } catch (err) {
+    console.error("Error fetching products from Firebase:", err);
+    return [];
   }
 }
 
@@ -68,24 +80,19 @@ async function login(e) {
   const password = document.getElementById('password').value;
   
   try {
-    const response = await fetch('http://localhost:3000/api/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    if (!response.ok) throw new Error("Backend offline");
-    const data = await response.json();
-    if (data.success) {
-      localStorage.setItem('ecommerce_currentUser', JSON.stringify(data.user));
-      window.location.href = data.user.role === 'admin' ? 'admin.html' : 'shop.html';
+    const q = db.collection('users').where('username', '==', username).where('password', '==', password);
+    const snapshot = await q.get();
+    
+    if (!snapshot.empty) {
+      let userData = snapshot.docs[0].data();
+      userData.id = snapshot.docs[0].id;
+      localStorage.setItem('ecommerce_currentUser', JSON.stringify(userData));
+      window.location.href = userData.role === 'admin' ? 'admin.html' : 'shop.html';
     } else {
       showToast('Invalid credentials!', 'danger');
     }
   } catch (err) { 
-    console.log("Backend offline. Falling back to offline login.");
-    // Offline mode mock login
-    let user = { username: username, role: username === 'admin' ? 'admin' : 'customer', email: '', address: '' };
-    localStorage.setItem('ecommerce_currentUser', JSON.stringify(user));
-    window.location.href = user.role === 'admin' ? 'admin.html' : 'shop.html';
+    showToast('Database connection failed', 'danger');
   }
 }
 
@@ -96,22 +103,19 @@ async function register(e) {
   const role = document.getElementById('reg-role').value;
   
   try {
-    const response = await fetch('http://localhost:3000/api/register', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, role })
-    });
-    if (!response.ok) throw new Error("Backend offline");
-    const data = await response.json();
-    if (data.success) {
-      showToast('Registration successful! Please login.', 'success');
-      toggleAuthMode();
-    } else {
-      showToast(data.message, 'danger');
+    const q = db.collection('users').where('username', '==', username);
+    const existing = await q.get();
+    
+    if (!existing.empty) {
+      showToast('Username already exists', 'danger');
+      return;
     }
-  } catch (err) { 
-    console.log("Backend offline. Offline registration successful.");
-    showToast('Offline mode: Registration simulated successfully! Please login.', 'success');
+    
+    await db.collection('users').add({ username, password, role: role || 'customer', email: '', address: '' });
+    showToast('Registration successful! Please login.', 'success');
     toggleAuthMode();
+  } catch (err) { 
+    showToast('Database connection failed', 'danger');
   }
 }
 
@@ -349,27 +353,27 @@ async function renderDetailedCategoryProducts(categories) {
 }
 
 // ====== Profile & Wishlist Logic ======
-function saveProfile(e) {
+async function saveProfile(e) {
   e.preventDefault();
   const current = getCurrentUser();
   const email = document.getElementById('setting-email').value;
   const address = document.getElementById('setting-address').value;
   const pw = document.getElementById('setting-password').value;
   
-  let users = getUsers();
-  let uIndex = users.findIndex(u => u.username === current.username);
-  
-  if(uIndex > -1) {
-    users[uIndex].email = email;
-    users[uIndex].address = address;
-    if(pw) users[uIndex].password = pw;
+  try {
+    const userRef = db.collection('users').doc(current.id);
+    let updates = { email, address };
+    if(pw) updates.password = pw;
     
-    setUsers(users);
+    await userRef.update(updates);
+    
     current.email = email;
     current.address = address;
     if(pw) current.password = pw;
     localStorage.setItem('ecommerce_currentUser', JSON.stringify(current));
     showToast('Profile updated successfully!', 'success');
+  } catch (e) {
+    showToast('Error updating profile', 'danger');
   }
 }
 
@@ -553,26 +557,12 @@ async function checkout() {
   };
   
   try {
-    const res = await fetch('http://localhost:3000/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
-    if (!res.ok) throw new Error("Backend offline");
-    const data = await res.json();
-    if(data.success) {
-      setCart([]);
-      showToast('Order Placed Successfully!', 'success');
-      setTimeout(() => window.location.href = 'orders.html', 1800);
-    }
-  } catch(e) {
-    console.log("Backend offline. Simulating order placement.");
-    let localOrders = JSON.parse(localStorage.getItem('offline_orders') || '[]');
-    localOrders.push(newOrder);
-    localStorage.setItem('offline_orders', JSON.stringify(localOrders));
+    await db.collection('orders').add(newOrder);
     setCart([]);
-    showToast('Offline Mode: Order Placed Successfully!', 'success');
+    showToast('Order Placed Successfully!', 'success');
     setTimeout(() => window.location.href = 'orders.html', 1800);
+  } catch(e) {
+    showToast('Database error. Could not place order.', 'danger');
   }
 }
 
@@ -584,14 +574,18 @@ async function renderUserOrders() {
   const user = getCurrentUser();
   let myOrders = [];
   try {
-    const res = await fetch('http://localhost:3000/api/orders');
-    if (!res.ok) throw new Error("Backend offline");
-    const allOrders = await res.json();
+    const snapshot = await db.collection('orders').get();
+    const allOrders = [];
+    snapshot.forEach(doc => {
+      let o = doc.data();
+      o.id = o.id || doc.id;
+      allOrders.push(o);
+    });
     myOrders = allOrders.filter(o => o.username === user.username);
   } catch(e) {
-    console.log("Backend offline. Loading offline orders.");
-    let localOrders = JSON.parse(localStorage.getItem('offline_orders') || '[]');
-    myOrders = localOrders.filter(o => o.username === user.username);
+    console.error("Error loading orders", e);
+    container.innerHTML = '<div class="text-center text-danger">Error loading orders</div>';
+    return;
   }
   
   if(myOrders.length === 0) {
@@ -657,29 +651,13 @@ function addProduct(e) {
       image: imageSrc || 'assets/images/product1.jpg'
     };
     
-    fetch('http://localhost:3000/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newProduct)
-    }).then(res => {
-      if (!res.ok) throw new Error("Backend offline");
-      return res.json();
-    }).then(async data => {
-      if(data.success) {
+    db.collection('products').doc(newProduct.id.toString()).set(newProduct)
+    .then(async () => {
         showToast('Product added to inventory globally!', 'success');
         document.getElementById('add-product-form').reset();
         await fetchProductsFromDB();
         renderAdminProducts();
-      } else {
-        showToast('Error adding product', 'danger');
-      }
-    }).catch(() => {
-        console.log("Backend offline. Simulating product addition locally.");
-        cachedProducts.push(newProduct);
-        showToast('Offline Mode: Product added locally!', 'success');
-        document.getElementById('add-product-form').reset();
-        renderAdminProducts();
-    });
+    }).catch(() => showToast('Error adding product', 'danger'));
   };
 
   if (imageInput.files && imageInput.files[0]) {
@@ -722,19 +700,12 @@ async function renderAdminProducts() {
 async function deleteProduct(id) {
   if(!confirm("Permanently remove this product from the master database?")) return;
   try {
-    const res = await fetch('http://localhost:3000/api/products/' + id, { method: 'DELETE' });
-    if (!res.ok) throw new Error("Backend offline");
-    const data = await res.json();
-    if(data.success) {
-      showToast('Product deleted', 'success');
-      await fetchProductsFromDB();
-      renderAdminProducts();
-    }
-  } catch (err) {
-    console.log("Backend offline. Removing product locally.");
-    cachedProducts = cachedProducts.filter(p => p.id !== id);
-    showToast('Offline Mode: Product deleted locally', 'success');
+    await db.collection('products').doc(id.toString()).delete();
+    showToast('Product deleted', 'success');
+    await fetchProductsFromDB();
     renderAdminProducts();
+  } catch (err) {
+    showToast('Error deleting product', 'danger');
   }
 }
 
@@ -743,12 +714,15 @@ async function renderAdminOrders() {
   if(!container) return;
   let orders = [];
   try {
-    const response = await fetch('http://localhost:3000/api/orders');
-    if (!response.ok) throw new Error("Backend offline");
-    orders = await response.json();
+    const snapshot = await db.collection('orders').get();
+    snapshot.forEach(doc => {
+      let o = doc.data();
+      o.id = o.id || doc.id;
+      orders.push(o);
+    });
+    orders.reverse();
   } catch(e) {
-    console.log("Backend offline. Loading local offline orders for Admin.");
-    orders = JSON.parse(localStorage.getItem('offline_orders') || '[]');
+    console.error("Error loading admin orders", e);
   }
   container.innerHTML = '';
   if(orders.length === 0) {
