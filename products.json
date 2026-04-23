@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "name": "Noise Cancelling Headphones",
+    "price": 299.99,
+    "image": "assets/images/product1.jpg",
+    "category": "Audio",
+    "rating": 4.8,
+    "reviews": 124,
+    "badge": "Best Seller"
+  },
+  {
+    "id": 2,
+    "name": "Phantom Smartwatch",
+    "price": 199.99,
+    "image": "assets/images/product2.jpg",
+    "category": "Wearables",
+    "rating": 4.5,
+    "reviews": 89,
+    "badge": "New"
+  },
+  {
+    "id": 3,
+    "name": "Ultra-thin Laptop M2",
+    "price": 1299.99,
+    "image": "assets/images/product3.jpg",
+    "category": "Computing",
+    "rating": 5,
+    "reviews": 42,
+    "badge": ""
+  },
+  {
+    "id": 4,
+    "name": "Ergonomic Mesh Chair",
+    "price": 349.5,
+    "image": "assets/images/product4.jpg",
+    "category": "Office",
+    "rating": 4.6,
+    "reviews": 215,
+    "badge": "Hot"
+  },
+  {
+    "id": 5,
+    "name": "Urban Sneakers Edition",
+    "price": 129,
+    "image": "assets/images/product5.jpg",
+    "category": "Apparel",
+    "rating": 4.3,
+    "reviews": 67,
+    "badge": "Limited"
+  },
+  {
+    "id": 6,
+    "name": "Premium Leather Backpack",
+    "price": 89.99,
+    "image": "assets/images/product6.jpg",
+    "category": "Accessories",
+    "rating": 4.7,
+    "reviews": 156,
+    "badge": ""
+  },
+  {
+    "id": 7,
+    "name": "Smart Home Assistant Hub",
+    "price": 149,
+    "image": "assets/images/product7.jpg",
+    "category": "Smart Home",
+    "rating": 4.9,
+    "reviews": 320,
+    "badge": "Hot"
+  },
+  {
+    "id": 8,
+    "name": "Professional DSLR Camera",
+    "price": 1899.99,
+    "image": "assets/images/product8.jpg",
+    "category": "Photography",
+    "rating": 4.8,
+    "reviews": 110,
+    "badge": "Pro"
+  },
+  {
+    "id": 9,
+    "name": "Pro Studio Headset",
+    "price": 149.99,
+    "image": "assets/images/product9.jpg",
+    "category": "Audio",
+    "rating": 4.7,
+    "reviews": 310,
+    "badge": ""
+  },
+  {
+    "id": 10,
+    "name": "Fitness Smartband",
+    "price": 59.5,
+    "image": "assets/images/product10.jpg",
+    "category": "Wearables",
+    "rating": 4.9,
+    "reviews": 450,
+    "badge": "Best Seller"
+  },
+  {
+    "id": 11,
+    "name": "Gaming Laptop Alpha",
+    "price": 1549.99,
+    "image": "assets/images/product11.jpg",
+    "category": "Computing",
+    "rating": 4.6,
+    "reviews": 85,
+    "badge": ""
+  },
+  {
+    "id": 12,
+    "name": "Executive Leather Chair",
+    "price": 199,
+    "image": "assets/images/product12.jpg",
+    "category": "Office",
+    "rating": 4.8,
+    "reviews": 520,
+    "badge": "Hot"
+  },
+  {
+    "id": 13,
+    "name": "Classic Running Shoes",
+    "price": 89.99,
+    "image": "assets/images/product13.jpg",
+    "category": "Apparel",
+    "rating": 4.2,
+    "reviews": 195,
+    "badge": ""
+  },
+  {
+    "id": 14,
+    "name": "Travel Laptop Backpack",
+    "price": 149.99,
+    "image": "assets/images/product14.jpg",
+    "category": "Accessories",
+    "rating": 4.7,
+    "reviews": 112,
+    "badge": "New"
+  },
+  {
+    "id": 15,
+    "name": "Voice Assistant Pro",
+    "price": 85,
+    "image": "assets/images/product15.jpg",
+    "category": "Smart Home",
+    "rating": 4.5,
+    "reviews": 66,
+    "badge": ""
+  },
+  {
+    "id": 16,
+    "name": "Mirrorless Camera Max",
+    "price": 1299,
+    "image": "assets/images/product16.jpg",
+    "category": "Photography",
+    "rating": 4.8,
+    "reviews": 315,
+    "badge": ""
+  },
+  {
+    "id": 17,
+    "name": "Wireless Earbuds",
+    "price": 59.99,
+    "image": "assets/images/product17.jpg",
+    "category": "Audio",
+    "rating": 4.4,
+    "reviews": 420,
+    "badge": "Sale"
+  },
+  {
+    "id": 18,
+    "name": "Classic Chrono Watch",
+    "price": 89.99,
+    "image": "assets/images/product18.jpg",
+    "category": "Wearables",
+    "rating": 4.6,
+    "reviews": 275,
+    "badge": ""
+  },
+  {
+    "id": 19,
+    "name": "Business Ultrabook",
+    "price": 899,
+    "image": "assets/images/product19.jpg",
+    "category": "Computing",
+    "rating": 4.9,
+    "reviews": 180,
+    "badge": "New"
+  },
+  {
+    "id": 20,
+    "name": "Standing Desk Stool",
+    "price": 149.5,
+    "image": "assets/images/product20.jpg",
+    "category": "Office",
+    "rating": 4.7,
+    "reviews": 405,
+    "badge": ""
+  },
+  {
+    "id": 21,
+    "name": "High-Top Sneakers",
+    "price": 75,
+    "image": "assets/images/product21.jpg",
+    "category": "Apparel",
+    "rating": 4.3,
+    "reviews": 120,
+    "badge": ""
+  },
+  {
+    "id": 22,
+    "name": "Premium Messenger Bag",
+    "price": 49,
+    "image": "assets/images/product22.jpg",
+    "category": "Accessories",
+    "rating": 4.8,
+    "reviews": 90,
+    "badge": "Hot"
+  },
+  {
+    "id": 23,
+    "name": "Security Hub Max",
+    "price": 199.99,
+    "image": "assets/images/product23.jpg",
+    "category": "Smart Home",
+    "rating": 4.6,
+    "reviews": 155,
+    "badge": ""
+  },
+  {
+    "id": 24,
+    "name": "Compact Point-and-Shoot",
+    "price": 499,
+    "image": "assets/images/product24.jpg",
+    "category": "Photography",
+    "rating": 4.9,
+    "reviews": 45,
+    "badge": "Limited"
+  }
+]
